@@ -2,6 +2,7 @@ import json
 import os
 import logging
 import concurrent.futures
+import traceback
 
 import tornado.concurrent
 import tornado.ioloop
@@ -34,10 +35,14 @@ class RoverWebSocket(tornado.websocket.WebSocketHandler):
         return True
 
     def on_message(self, message):
-        jm = json.loads(message)
-        method = getattr(rover, jm['method'])
-        retval = method(**jm['kwargs'])
-        self.write_message(json.dumps(retval))
+        try:
+            jm = json.loads(message)
+            method = getattr(rover, jm['method'])
+            retval = method(**jm['kwargs'])
+            self.write_message(json.dumps(retval))
+        except:
+            logging.exception("Exception executing rover method")
+            self.write_message(json.dumps({"error": traceback.format_exc()}))
 
 
 class RangeFinderWebSocket(tornado.websocket.WebSocketHandler):
@@ -74,9 +79,6 @@ class FirehoseWebSocket(tornado.websocket.WebSocketHandler):
             "accel": sensor.get_accel_data(),
             "temp": sensor.get_temp()
         }))
-
-    def on_close(self):
-        self.callback.stop()
 
     def on_close(self):
         logging.debug("Closing /firehose ws")
@@ -136,8 +138,7 @@ def main():
     logging.info("Starting app on port 8888")
     app = make_app()
     app.listen(8888)
-    print "Hallo"
-    logging.info("Starting io loop")
+    logging.info("Starting io loop, running on http://localhost:8888/")
     tornado.ioloop.IOLoop.current().start()
 
 
