@@ -1,10 +1,13 @@
 import json
 import os
 import logging
+import concurrent.futures
 
+import tornado.concurrent
 import tornado.ioloop
 import tornado.web
 import tornado.websocket
+import tornado.gen
 
 try:
     from mpu6050 import mpu6050
@@ -37,22 +40,23 @@ class RoverWebSocket(tornado.websocket.WebSocketHandler):
         self.write_message(json.dumps(retval))
 
 
-import concurrent.futures
-
-
-executor = concurrent.futures.ThreadPoolExecutor()
-
-
 class RangeFinderWebSocket(tornado.websocket.WebSocketHandler):
+    executor = concurrent.futures.ThreadPoolExecutor(max_workers=2)
     def open(self):
         self.callback = tornado.ioloop.PeriodicCallback(self.send_rangefinderdata, RANGEFINDER_INTERVAL)
         self.callback.start()
 
+    @tornado.gen.coroutine
     def send_rangefinderdata(self):
-        future = executor.submit(rover.get_distance)
-        self.write_message(json.dumps(future.result()))
+        distance = yield self.get_distance()
+        self.write_message(json.dumps(distance))
+
+    @tornado.concurrent.run_on_executor
+    def get_distance(self):
+        return rover.get_distance()
 
     def on_close(self):
+        logging.debug("Closing /rangefinder ws")
         self.callback.stop()
 
 
@@ -75,6 +79,7 @@ class FirehoseWebSocket(tornado.websocket.WebSocketHandler):
         self.callback.stop()
 
     def on_close(self):
+        logging.debug("Closing /firehose ws")
         self.callback.stop()
 
 
