@@ -6,8 +6,10 @@ import tornado.ioloop
 import tornado.web
 import tornado.websocket
 
-from mpu6050 import mpu6050
-from corsmixin import CORSMixin
+try:
+    from mpu6050 import mpu6050
+except ImportError:
+    print("WARNING: Unable to import mpu6050")
 
 try:
     import rrb3
@@ -21,6 +23,9 @@ sensor = None # type: mpu6050
 
 
 class RoverWebSocket(tornado.websocket.WebSocketHandler):
+    def check_origin(self, origin):
+        return True
+
     def on_message(self, message):
         jm = json.loads(message)
         method = getattr(rover, jm['method'])
@@ -29,6 +34,9 @@ class RoverWebSocket(tornado.websocket.WebSocketHandler):
 
 
 class FirehoseWebSocket(tornado.websocket.WebSocketHandler):
+    def check_origin(self, origin):
+        return True
+
     def open(self):
         self.callback = tornado.ioloop.PeriodicCallback(self.send_gyrodata, 500)
         self.callback.start()
@@ -39,6 +47,9 @@ class FirehoseWebSocket(tornado.websocket.WebSocketHandler):
             "accel": sensor.get_accel_data(),
             "temp": sensor.get_temp()}
         ))
+
+    def on_close(self):
+        self.callback.stop()
 
 
 class MainHandler(tornado.web.RequestHandler):
@@ -68,9 +79,12 @@ def create_rrb3(mockmode):
 
 def create_sensor(mockmode):
     if not mockmode:
+        from mpu6050 import mpu6050
         return mpu6050(0x68)
     else:
-        assert False, "mockmode for sensor not implemented"
+        from mock_mpu6050 import MockMPU6050
+        return MockMPU6050()
+
 
 
 def main():
