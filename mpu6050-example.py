@@ -1,0 +1,1 @@
+mpu6050-master/bin/mpu6050-example

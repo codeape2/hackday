@@ -18,6 +18,11 @@
         ws.onmessage = function(evt) {
             console.log(evt.data);
         }
+
+        var firehose = new WebSocket("ws://" + loc.host + "/firehose");
+        firehose.onmessage = function(evt) {
+            console.log("FIREHOSE:",  evt.data);
+        }
     </script>
 </body>
 </html>

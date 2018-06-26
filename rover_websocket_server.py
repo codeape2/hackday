@@ -6,6 +6,8 @@ import tornado.ioloop
 import tornado.web
 import tornado.websocket
 
+from mpu6050 import mpu6050
+
 try:
     import rrb3
 except ImportError:
@@ -14,6 +16,7 @@ except ImportError:
 
 # the global RRB3 instance
 rover = None  # type: rrb3.RRB3
+sensor = None # type: mpu6050
 
 
 class RoverWebSocket(tornado.websocket.WebSocketHandler):
@@ -24,6 +27,14 @@ class RoverWebSocket(tornado.websocket.WebSocketHandler):
         self.write_message(json.dumps(retval))
 
 
+class FirehoseWebSocket(tornado.websocket.WebSocketHandler):
+    def open(self):
+        self.callback = tornado.ioloop.PeriodicCallback(self.send_gyrodata, 500)
+        self.callback.start()
+
+    def send_gyrodata(self):
+        self.write_message(json.dumps(sensor.get_all_data()))
+
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
@@ -33,7 +44,8 @@ class MainHandler(tornado.web.RequestHandler):
 def make_app():
     return tornado.web.Application([
         ("/", MainHandler),
-        ("/roverws", RoverWebSocket)
+        ("/roverws", RoverWebSocket),
+        ("/firehose", FirehoseWebSocket)
     ], static_path=os.path.join(os.path.dirname(__file__), 'static'))
 
 
@@ -49,10 +61,16 @@ def create_rrb3(mockmode):
         return mock_rrb3.MockRRB3()
 
 
+def create_sensor(mockmode):
+    if not mockmode:
+        return mpu6050(0x68)
+    else:
+        assert False, "mockmode for sensor not implemented"
 
 
 def main():
     global rover
+    global sensor
 
     from argparse import ArgumentParser
     parser = ArgumentParser()
@@ -62,6 +80,7 @@ def main():
     logging.basicConfig(level=logging.DEBUG)
 
     rover = create_rrb3(args.mockmode)
+    sensor = create_sensor(args.mockmode)
 
     logging.info("Starting app on port 8888")
     app = make_app()
