@@ -63,8 +63,11 @@ def main():
 
     rover = create_rrb3(args.mockmode)
 
+    logging.info("Starting app on port 8888")
     app = make_app()
     app.listen(8888)
+    print "Hallo"
+    logging.info("Starting io loop")
     tornado.ioloop.IOLoop.current().start()
 
 

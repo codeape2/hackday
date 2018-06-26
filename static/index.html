@@ -11,7 +11,9 @@
         var loc = window.location;
         var ws = new WebSocket("ws://" + loc.host + "/roverws");
         ws.onopen = function() {
-            ws.send(JSON.stringify({a: 3, b: 4}));
+            ws.send(JSON.stringify({method: "set_motors", kwargs: {
+
+                }}));
         };
         ws.onmessage = function(evt) {
             console.log(evt.data);
