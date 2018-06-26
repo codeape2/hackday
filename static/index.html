@@ -17,12 +17,22 @@
         };
         ws.onmessage = function(evt) {
             console.log(evt.data);
-        }
+        };
 
         var firehose = new WebSocket("ws://" + loc.host + "/firehose");
         firehose.onmessage = function(evt) {
-            console.log("FIREHOSE:",  evt.data);
-        }
+            console.log(typeof evt.data);
+            const obj = JSON.parse(evt.data);
+            const accel = obj.accel;
+            console.log("X", accel.x, "Y", accel.y, "Z", accel.z);
+        };
+
+        var rangefinder = new WebSocket("ws://" + loc.host + "/rangefinder");
+        rangefinder.onmessage = function(evt) {
+            console.log(evt.data);
+        };
+
+
     </script>
 </body>
 </html>
