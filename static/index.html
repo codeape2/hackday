@@ -9,8 +9,8 @@
     <p>Bruk WASDZ</p>
 
     <script>
-        const OPEN_FIREHOSE = false;
-        const OPEN_RANGEFINDER = false;
+        const OPEN_FIREHOSE = true;
+        const OPEN_RANGEFINDER = true;
 
         var loc = window.location;
         var ws = new WebSocket("ws://" + loc.host + "/roverws");
@@ -66,18 +66,17 @@
         if (OPEN_FIREHOSE) {
             var firehose = new WebSocket("ws://" + loc.host + "/firehose");
             firehose.onmessage = function(evt) {
-                console.log(evt.data);
-                /*console.log(typeof evt.data);
+                //console.log(evt.data);
                 const obj = JSON.parse(evt.data);
                 const accel = obj.accel;
-                console.log("X", accel.x, "Y", accel.y, "Z", accel.z);*/
+                console.log("X", accel.x, "Y", accel.y, "Z", accel.z);
             };
         }
 
         if (OPEN_RANGEFINDER) {
             var rangefinder = new WebSocket("ws://" + loc.host + "/rangefinder");
             rangefinder.onmessage = function(evt) {
-                console.log(evt.data);
+                console.log("RANGE", evt.data);
             };
         }
     </script>
