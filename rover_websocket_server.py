@@ -1,13 +1,18 @@
 import json
 import os
 import logging
+import concurrent.futures
 
+import tornado.concurrent
 import tornado.ioloop
 import tornado.web
 import tornado.websocket
+import tornado.gen
 
-from mpu6050 import mpu6050
-from corsmixin import CORSMixin
+try:
+    from mpu6050 import mpu6050
+except ImportError:
+    print("WARNING: Unable to import mpu6050")
 
 try:
     import rrb3
@@ -25,6 +30,9 @@ RANGEFINDER_INTERVAL = 200
 
 
 class RoverWebSocket(tornado.websocket.WebSocketHandler):
+    def check_origin(self, origin):
+        return True
+
     def on_message(self, message):
         jm = json.loads(message)
         method = getattr(rover, jm['method'])
@@ -32,26 +40,30 @@ class RoverWebSocket(tornado.websocket.WebSocketHandler):
         self.write_message(json.dumps(retval))
 
 
-import concurrent.futures
-
-
-executor = concurrent.futures.ThreadPoolExecutor()
-
-
 class RangeFinderWebSocket(tornado.websocket.WebSocketHandler):
+    executor = concurrent.futures.ThreadPoolExecutor(max_workers=2)
     def open(self):
         self.callback = tornado.ioloop.PeriodicCallback(self.send_rangefinderdata, RANGEFINDER_INTERVAL)
         self.callback.start()
 
+    @tornado.gen.coroutine
     def send_rangefinderdata(self):
-        future = executor.submit(rover.get_distance)
-        self.write_message(json.dumps(future.result()))
+        distance = yield self.get_distance()
+        self.write_message(json.dumps(distance))
+
+    @tornado.concurrent.run_on_executor
+    def get_distance(self):
+        return rover.get_distance()
 
     def on_close(self):
+        logging.debug("Closing /rangefinder ws")
         self.callback.stop()
 
 
 class FirehoseWebSocket(tornado.websocket.WebSocketHandler):
+    def check_origin(self, origin):
+        return True
+
     def open(self):
         self.callback = tornado.ioloop.PeriodicCallback(self.send_gyrodata, FIREHOSE_INTERVAL)
         self.callback.start()
@@ -64,6 +76,10 @@ class FirehoseWebSocket(tornado.websocket.WebSocketHandler):
         }))
 
     def on_close(self):
+        self.callback.stop()
+
+    def on_close(self):
+        logging.debug("Closing /firehose ws")
         self.callback.stop()
 
 
@@ -95,9 +111,12 @@ def create_rrb3(mockmode):
 
 def create_sensor(mockmode):
     if not mockmode:
+        from mpu6050 import mpu6050
         return mpu6050(0x68)
     else:
-        assert False, "mockmode for sensor not implemented"
+        from mock_mpu6050 import MockMPU6050
+        return MockMPU6050()
+
 
 
 def main():
