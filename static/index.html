@@ -38,6 +38,10 @@
             execute('right', {});
         }
 
+        function back() {
+            execute('reverse', {speed: 0.3});
+        }
+
         function keyPress(event){
             code = event.keyCode;
             if (code == 119) {

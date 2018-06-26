@@ -16,6 +16,9 @@ class MockRRB3(object):
     def forward(self):
         print "going forward"
 
+    def reverse(self, speed):
+        print "going in reverse"
+
     def set_driver_pins(self, left_pwm, left_dir, right_pwm, right_dir):
         print "set_driver_pins!"
 
