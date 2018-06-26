@@ -7,6 +7,7 @@ import tornado.web
 import tornado.websocket
 
 from mpu6050 import mpu6050
+from corsmixin import CORSMixin
 
 try:
     import rrb3
@@ -33,7 +34,11 @@ class FirehoseWebSocket(tornado.websocket.WebSocketHandler):
         self.callback.start()
 
     def send_gyrodata(self):
-        self.write_message(json.dumps(sensor.get_all_data()))
+        self.write_message(json.dumps({
+            "gyro": sensor.get_gyro_data(),
+            "accel": sensor.get_accel_data(),
+            "temp": sensor.get_temp()}
+        ))
 
 
 class MainHandler(tornado.web.RequestHandler):
