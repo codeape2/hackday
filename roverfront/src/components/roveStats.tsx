@@ -49,8 +49,8 @@ export default class RoverStats extends React.Component<{}, {}> {
                     },
                     {
                         title: { text: "Acceleration" },
-                        min: -100,
-                        max: 100,
+                        min: -15,
+                        max: 15,
                         opposite: true
                     }
                 ],
@@ -68,7 +68,7 @@ export default class RoverStats extends React.Component<{}, {}> {
                 },
                 {
                     id: "accelSeriesY",
-                    name: "Acceleration X",
+                    name: "Acceleration Y",
                     data: [],
                     yAxis: 1
                 }]
