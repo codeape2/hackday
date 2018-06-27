@@ -28,11 +28,11 @@ export default class Rover implements IRover {
         await this.connection.execute("left", {seconds: seconds, speed: speed})
     }
 
-    public async wait(waitInMs: number): Promise<void> {
+    public async wait(waitInSeconds: number): Promise<void> {
         return new Promise<void>(resolve => {
             setTimeout(() => {
                 resolve();
-            }, waitInMs);
+            }, waitInSeconds * 1000);
         });
     }
 }

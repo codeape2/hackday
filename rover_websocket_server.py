@@ -58,7 +58,8 @@ class RoverWebSocket(tornado.websocket.WebSocketHandler):
             methodRetval = yield self.execute(method, kwargs)
             response = {
                 "actionId": actionId,
-                "data": methodRetval
+                "data": methodRetval,
+                "method": jm['method']
             }
             
             self.write_message(json.dumps(response))
