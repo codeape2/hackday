@@ -36,8 +36,13 @@ export default class Rover implements IRover {
         });
     }
 
-    public async stopWhenRangeIsLessThan(range: number) {
+    public async stopWhenRangeLessThan(range: number): Promise<void> {
         await this.waitForRangeLessThan(range);
+        await this.stop();
+    }
+
+    public async stopWhenRangeGreaterThan(range: number): Promise<void> {
+        await this.waitForRangeGreaterThan(range);
         await this.stop();
     }
 
@@ -51,4 +56,17 @@ export default class Rover implements IRover {
             }, 100);
         });
     }
+
+    public async waitForRangeGreaterThan(range: number) {
+        return new Promise<void>(resolve => {
+            const interval = setInterval(() => {
+                if (this.distance.getLatestDistance().value > range) {
+                    clearInterval(interval);
+                    resolve();
+                }
+            }, 100);
+        });
+    }
+
+
 }

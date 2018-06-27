@@ -75,6 +75,9 @@ class RoverWebSocket(tornado.websocket.WebSocketHandler):
 class RangeFinderWebSocket(tornado.websocket.WebSocketHandler):
     executor = threadpoolexecutor
 
+    def check_origin(self, origin):
+        return True
+
     def open(self):
         self.callback = tornado.ioloop.PeriodicCallback(self.send_rangefinderdata_async, RANGEFINDER_INTERVAL)
         self.callback.start()
