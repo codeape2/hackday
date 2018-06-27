@@ -23,6 +23,9 @@ export default class RoverEditor extends React.Component<IRoverEditorProps, {}> 
     right(seconds: number, speed: number): Promise<void>;
     left(seconds: number, speed: number): Promise<void>;
 
+    getRange(): number;
+    reverse(seconds: number, speed: number): Promise<void>;
+
     wait(waitInSeconds: number): Promise<void>;
     stopWhenRangeLessThan(range: number): Promise<void>;
     stopWhenRangeGreaterThan(range: number): Promise<void>;
