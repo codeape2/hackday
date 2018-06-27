@@ -80,6 +80,9 @@ class RangeFinderWebSocket(tornado.websocket.WebSocketHandler):
         logging.debug("Closing /rangefinder ws")
         self.callback.stop()
 
+class NoCacheStaticFileHandler(tornado.web.StaticFileHandler):
+    def set_extra_headers(self, path):
+        self.set_header("Cache-control", "no-cache")
 
 class FirehoseWebSocket(tornado.websocket.WebSocketHandler):
     def check_origin(self, origin):
@@ -107,7 +110,7 @@ def make_app():
         ("/roverws", RoverWebSocket),
         ("/firehose", FirehoseWebSocket),
         ("/rangefinder", RangeFinderWebSocket),
-        (r"/(.*)", tornado.web.StaticFileHandler, {"path": root, "default_filename": "index.html"})
+        (r"/(.*)", NoCacheStaticFileHandler, {"path": root, "default_filename": "index.html"})
     ])
 
 
