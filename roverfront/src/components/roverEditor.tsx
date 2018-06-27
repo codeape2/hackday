@@ -15,7 +15,7 @@ export default class RoverEditor extends React.Component<IRoverEditorProps, {}> 
 
         
         monaco.languages.typescript.typescriptDefaults.addExtraLib(
-`export interface IRover {
+`declare interface IRover {
     forward(): Promise<void>;
     stop(): Promise<void>;
     wait(waitInMs: number): Promise<void>;
@@ -39,12 +39,15 @@ declare const rover: IRover;
 
     public render() {
         const options: monaco.editor.IEditorConstructionOptions = {
-            selectOnLineNumbers: true
+            selectOnLineNumbers: true,
+            minimap: {
+                enabled: false
+            }
         };
 
         return <MonacoEditor
-            width="800"
-            height="600"
+            width="600"
+            height="500"
             language="typescript"
             theme="vs-dark"
             value={this.currentCode}

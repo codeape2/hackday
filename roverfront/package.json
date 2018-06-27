@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "highcharts": "^6.1.1",
+    "moment": "^2.22.2",
     "monaco-editor": "^0.13.1",
     "raw-loader": "^0.5.1",
     "react": "^16.4.1",
