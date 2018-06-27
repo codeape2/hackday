@@ -3,7 +3,7 @@ import rrb3 as rrb
 import time
 
 # Change these for your setup.
-IP_ADDRESS = '192.168.1.13' # of your Pi
+IP_ADDRESS = '192.168.1.15' # of your Pi
 BATTERY_VOLTS = 9
 MOTOR_VOLTS = 6
 
@@ -28,6 +28,6 @@ def index():
         
 # Start the webserver running on port 80
 try: 
-    run(host=IP_ADDRESS, port=80)
+    run(host=IP_ADDRESS, port=8889)
 finally:  
     rr.cleanup()

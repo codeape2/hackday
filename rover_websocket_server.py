@@ -2,9 +2,10 @@ import json
 import os
 import logging
 import concurrent.futures
+import traceback
 
 import tornado.concurrent
-import tornado.ioloop
+from tornado.ioloop import IOLoop
 import tornado.web
 import tornado.websocket
 import tornado.gen
@@ -29,25 +30,45 @@ FIREHOSE_INTERVAL = 200
 RANGEFINDER_INTERVAL = 200
 
 
+threadpoolexecutor = concurrent.futures.ThreadPoolExecutor(max_workers=4)
+
+
 class RoverWebSocket(tornado.websocket.WebSocketHandler):
+    executor = threadpoolexecutor
+
     def check_origin(self, origin):
         return True
 
     def on_message(self, message):
-        jm = json.loads(message)
-        method = getattr(rover, jm['method'])
-        retval = method(**jm['kwargs'])
-        self.write_message(json.dumps(retval))
+        IOLoop.current().spawn_callback(self.on_message_async, message)
+
+    @tornado.gen.coroutine
+    def on_message_async(self, message):
+        try:
+            logging.debug(message)
+            jm = json.loads(message)
+            method = getattr(rover, jm['method'])
+            kwargs = jm['kwargs']
+            retval = yield self.execute(method, kwargs)
+            self.write_message(json.dumps(retval))
+        except:
+            logging.exception("Exception executing rover method")
+            self.write_message(json.dumps({"error": traceback.format_exc()}))
+
+    @tornado.concurrent.run_on_executor
+    def execute(self, method, kwargs):
+        return method(**kwargs)
 
 
 class RangeFinderWebSocket(tornado.websocket.WebSocketHandler):
-    executor = concurrent.futures.ThreadPoolExecutor(max_workers=2)
+    executor = threadpoolexecutor
+
     def open(self):
-        self.callback = tornado.ioloop.PeriodicCallback(self.send_rangefinderdata, RANGEFINDER_INTERVAL)
+        self.callback = tornado.ioloop.PeriodicCallback(self.send_rangefinderdata_async, RANGEFINDER_INTERVAL)
         self.callback.start()
 
     @tornado.gen.coroutine
-    def send_rangefinderdata(self):
+    def send_rangefinderdata_async(self):
         distance = yield self.get_distance()
         self.write_message(json.dumps(distance))
 
@@ -74,9 +95,6 @@ class FirehoseWebSocket(tornado.websocket.WebSocketHandler):
             "accel": sensor.get_accel_data(),
             "temp": sensor.get_temp()
         }))
-
-    def on_close(self):
-        self.callback.stop()
 
     def on_close(self):
         logging.debug("Closing /firehose ws")
@@ -132,9 +150,8 @@ def main():
     logging.info("Starting app on port 8888")
     app = make_app()
     app.listen(8888)
-    print("Hallo")
-    logging.info("Starting io loop")
-    tornado.ioloop.IOLoop.current().start()
+    logging.info("Starting io loop, running on http://localhost:8888/")
+    IOLoop.current().start()
 
 
 if __name__ == "__main__":

@@ -1,3 +1,27 @@
 172.17.5.20
 192.168.1.15
 pi / foobar
+
+- WS-protokoll /roverws:
+
+    Send {method: "...", kwargs: {a: ..., b: ...}
+    Vent på svar
+
+    Forslag TS-API:
+
+    const retval = await execute(method, kwargs);
+
+    function execute(method: str, kwargs: any) : Promise<any> {
+        if (ws.onmessage) {
+            throw new Error("Method in progress");
+        }
+        return new Promise(resolve => {
+            ws.onmessage = evt => {
+                resolve(JSON.parse(evt.data));
+            }
+            ws.send({method: method, kwargs: kwargs);
+        });
+    }
+
+Skriv ut kildekode python-modul.
+
