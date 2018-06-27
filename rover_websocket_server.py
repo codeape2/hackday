@@ -49,8 +49,14 @@ class RoverWebSocket(tornado.websocket.WebSocketHandler):
             jm = json.loads(message)
             method = getattr(rover, jm['method'])
             kwargs = jm['kwargs']
-            retval = yield self.execute(method, kwargs)
-            self.write_message(json.dumps(retval))
+            actionId = jm['actionId']
+            methodRetval = yield self.execute(method, kwargs)
+            response = {
+                actionId: actionId,
+                data: methodRetval
+            }
+            
+            self.write_message(json.dumps(response))
         except:
             logging.exception("Exception executing rover method")
             self.write_message(json.dumps({"error": traceback.format_exc()}))
