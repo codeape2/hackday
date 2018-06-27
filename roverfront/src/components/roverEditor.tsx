@@ -15,11 +15,15 @@ export default class RoverEditor extends React.Component<IRoverEditorProps, {}> 
 
         
         monaco.languages.typescript.typescriptDefaults.addExtraLib(
-`interface IRover {
+`export interface IRover {
     forward(): Promise<void>;
+    stop(): Promise<void>;
+    wait(waitInMs: number): Promise<void>;
 }
 
-declare const rover: IRover;`
+// For the monaco-editor. We don't have time to inject this properly there.
+declare const rover: IRover;
+`
 , "rover.d.ts");
     }
 

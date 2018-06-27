@@ -53,6 +53,8 @@ class App extends React.Component {
 async (rover: IRover) => {
   // Your code here
   await rover.forward();
+  await rover.wait(3000);
+  await rover.stop();
 }
 `;
     return <div className="app">

@@ -1,7 +1,8 @@
 export interface IRover {
     forward(): Promise<void>;
-    // sleep(waitInMs: number): Promise<void>;
+    stop(): Promise<void>;
+    wait(waitInMs: number): Promise<void>;
 }
 
-// Make this ambiently available so it works in the 
-//declare const rover: IRover;
+// For the monaco-editor. We don't have time to inject this properly there.
+declare const rover: IRover;

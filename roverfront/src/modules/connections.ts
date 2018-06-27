@@ -18,8 +18,10 @@ export class RoverConnection {
                 throw new Error("No .data on execute-response event.")
             }
 
+            const responseData = JSON.parse(evt.data);
+
             // The server should respond with what action it has completed.
-            const actionId = evt.data.actionId;
+            const actionId = responseData.actionId;
 
             // Find promise to resolve.
             const promiseToResolve = this.resolveFunctionsById[actionId];
