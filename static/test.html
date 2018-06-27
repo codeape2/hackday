@@ -9,8 +9,8 @@
     <p>Bruk WASDZ</p>
 
     <script>
-        const OPEN_FIREHOSE = true;
-        const OPEN_RANGEFINDER = true;
+        const OPEN_FIREHOSE = false;
+        const OPEN_RANGEFINDER = false;
 
         var loc = window.location;
         var ws = new WebSocket("ws://" + loc.host + "/roverws");
@@ -19,7 +19,7 @@
         };
 
         function execute(method, kwargs) {
-            ws.send(JSON.stringify({method: method, kwargs: kwargs}));
+            ws.send(JSON.stringify({method: method, kwargs: kwargs, actionId: 'foobar'}));
         }
 
         function forward() {
