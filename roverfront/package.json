@@ -3,16 +3,21 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "monaco-editor": "^0.13.1",
+    "raw-loader": "^0.5.1",
     "react": "^16.4.1",
+    "react-app-rewired": "^1.5.2",
     "react-dom": "^16.4.1",
+    "react-monaco-editor": "^0.17.2",
     "react-scripts-ts": "2.16.0"
   },
   "scripts": {
-    "start": "react-scripts-ts start",
-    "build": "react-scripts-ts build",
+    "start": "react-app-rewired start --scripts-version react-scripts-ts",
+    "build": "react-app-rewired build --scripts-version react-scripts-ts",
     "postbuild": "cp -a build/. ../static",
-    "test": "react-scripts-ts test --env=jsdom",
-    "eject": "react-scripts-ts eject"
+    "test": "react-app-rewired test --scripts-version react-scripts-ts --env=jsdom",
+    "eject": "react-scripts-ts eject",
+    "tsc": "tsc"
   },
   "devDependencies": {
     "@types/jest": "^23.1.2",
