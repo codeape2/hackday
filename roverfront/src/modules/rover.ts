@@ -16,6 +16,10 @@ export default class Rover implements IRover {
         await this.connection.execute("forward", {seconds: seconds, speed: speed});
     }
 
+    public getRange() {
+        return this.distance.getLatestDistance().value;
+    }
+
     public async stop(): Promise<void> {
         await this.connection.execute("stop", {});
     }
@@ -26,6 +30,10 @@ export default class Rover implements IRover {
 
     public async left(seconds:number=0, speed:number=0.5): Promise<void> {
         await this.connection.execute("left", {seconds: seconds, speed: speed})
+    }
+
+    public async reverse(seconds: number=0, speed: number=1.0): Promise<void> {
+        await this.connection.execute("reverse", {seconds: seconds, speed: speed});
     }
 
     public async wait(waitInSeconds: number): Promise<void> {

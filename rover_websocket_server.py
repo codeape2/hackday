@@ -164,7 +164,8 @@ def create_camera(mockmode):
         return PiCamera()
     else:
         class MockCamera:
-            pass
+            def capture(self, *args, **kwargs):
+                pass
         return MockCamera()
 
 
@@ -183,7 +184,7 @@ def main():
 
     rover = create_rrb3(args.mockmode)
     sensor = create_sensor(args.mockmode)
-    camera = create_camera(args.mockmode)
+    camera = create_camera(True)
 
     logging.info("Starting app on port 8888")
     app = make_app()
