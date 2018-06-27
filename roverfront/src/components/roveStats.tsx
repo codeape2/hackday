@@ -41,20 +41,36 @@ export default class RoverStats extends React.Component<{}, {}> {
                 chart: {
                     type: "column"
                 },
+                yAxis: [
+                    {
+                        title: { text: "Range" },
+                        min: 0,
+                        max: 600
+                    },
+                    {
+                        title: { text: "Acceleration" },
+                        min: -100,
+                        max: 100,
+                        opposite: true
+                    }
+                ],
                 series: [{
                     id: "rangeSeries",
                     name: "Range",
-                    data: []
+                    data: [],
+                    yAxis: 0
                 },
                 {
                     id: "accelSeriesX",
                     name: "Acceleration X",
-                    data: []
+                    data: [],
+                    yAxis: 1
                 },
                 {
                     id: "accelSeriesY",
                     name: "Acceleration X",
-                    data: []
+                    data: [],
+                    yAxis: 1
                 }]
             });
         }
