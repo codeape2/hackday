@@ -115,7 +115,7 @@ interface IRangeMeasurement {
 export class RangeFinder {
     private socket: WebSocket;
 
-    private measurements: IRangeMeasurement[];
+    private measurements: IRangeMeasurement[] = [];
     private latestMeasurement: IRangeMeasurement;
 
     constructor(host: string) {

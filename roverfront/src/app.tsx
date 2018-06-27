@@ -2,6 +2,7 @@
 import * as React from 'react';
 import './app.css';
 
+import * as moment from "moment";
 import logo from './logo.png';
 import RoverEditor from './components/roverEditor';
 import { compileTs } from './modules/tsCompiler';
@@ -13,10 +14,18 @@ import { IRover } from './rover';
 class App extends React.Component {
 
   private rover: Rover;
+  private cameraImage: HTMLImageElement | null;
 
   constructor(props: any) {
     super(props);
     this.rover = new Rover();
+
+    setTimeout(() => {
+      const url = this.getCameraUrl();
+      if (this.cameraImage) {
+        this.cameraImage.src = url + "?" + moment().valueOf()
+      }
+    }, 5000);
   }
 
   public componentDidMount() {
@@ -46,8 +55,12 @@ class App extends React.Component {
     }
   };
 
+  private getCameraUrl() {
+    return "http://" + roverSettings.host + "/camera";
+  }
 
   public render() {
+
     const startCode =
       `
 async (rover: IRover) => {
@@ -70,7 +83,9 @@ async (rover: IRover) => {
         </div>
         <div className="monitor">
           <div className="stats">stats</div>
-          <div className="camera">camera</div>
+          <div className="camera">
+            <img src={this.getCameraUrl()} ref={cameraImage => this.cameraImage = cameraImage} />
+          </div>
         </div>
       </main>
     </div>;

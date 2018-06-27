@@ -40,7 +40,7 @@ div.editor .main {
 div.monitor {
   grid-column: 2;
   display: grid;
-  grid-template-rows: 1fr 1fr;
+  grid-template-rows: 50% 50%;
 }
 
 div.monitor .stats {
@@ -49,6 +49,11 @@ div.monitor .stats {
 
 div.monitor .camera {
   grid-row: 2;
+}
+
+div.monitor .camera img {
+  width: 100%;
+  height: 100%;
 }
 
 img.app-logo {
