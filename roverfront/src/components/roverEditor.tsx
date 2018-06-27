@@ -1,6 +1,7 @@
 import * as monaco from 'monaco-editor';
 import * as React from 'react';
 import MonacoEditor from 'react-monaco-editor';
+// import roverDefs from '../rover.txt';
 
 interface IRoverEditorProps {
     initialCode: string;
@@ -11,6 +12,15 @@ export default class RoverEditor extends React.Component<IRoverEditorProps, {}> 
     constructor(props: IRoverEditorProps) {
         super(props);
         this.currentCode = props.initialCode;
+
+        
+        monaco.languages.typescript.typescriptDefaults.addExtraLib(
+`interface IRover {
+    forward(): Promise<void>;
+}
+
+declare const rover: IRover;`
+, "rover.d.ts");
     }
 
     // A bit dirty, but let's just expose the code as a public field.
