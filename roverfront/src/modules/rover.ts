@@ -35,4 +35,20 @@ export default class Rover implements IRover {
             }, waitInSeconds * 1000);
         });
     }
+
+    public async stopWhenRangeIsLessThan(range: number) {
+        await this.waitForRangeLessThan(range);
+        await this.stop();
+    }
+
+    public async waitForRangeLessThan(range: number) {
+        return new Promise<void>(resolve => {
+            const interval = setInterval(() => {
+                if (this.distance.getLatestDistance().value < range) {
+                    clearInterval(interval);
+                    resolve();
+                }
+            }, 100);
+        });
+    }
 }
