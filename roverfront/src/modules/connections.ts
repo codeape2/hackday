@@ -1,3 +1,5 @@
+import * as moment from "moment";
+
 interface IInvocation {
     actionId: string;
     method: string;
@@ -105,12 +107,38 @@ export class Firehose {
     }
 }
 
+interface IRangeMeasurement {
+    tick: number;
+    value: number;
+}
+
 export class RangeFinder {
     private socket: WebSocket;
+
+    private measurements: IRangeMeasurement[];
+    private latestMeasurement: IRangeMeasurement;
+
     constructor(host: string) {
         this.socket = new WebSocket("ws://" + host + "/rangefinder");
         this.socket.onmessage = (evt) => {
             console.log("RANGE", evt.data);
+            const range = JSON.parse(evt.data);
+
+            this.addMeasurement(range);
         };
+    }
+
+    private addMeasurement(range: number) {
+        const measurement: IRangeMeasurement = {
+            tick: moment().valueOf(),
+            value: range
+        };
+
+        this.latestMeasurement = measurement;
+        this.measurements.push(measurement);
+    }
+
+    public getLatestDistance() {
+        return this.latestMeasurement;
     }
 }

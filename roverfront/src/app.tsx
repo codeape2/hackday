@@ -58,9 +58,7 @@ async (rover: IRover) => {
 }
 `;
     return <div className="app">
-      <img className="app-logo" src={logo} alt="logo" />
       <p>RoverFront</p>
-
       <RoverEditor initialCode={startCode} ref={(editor) => this.editor = editor} />
 
       <button onClick={this.runCode}>Run</button>

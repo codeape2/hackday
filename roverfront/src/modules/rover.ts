@@ -1,13 +1,15 @@
 import { IRover } from "../rover";
-import { RoverConnection } from "./connections";
+import { RoverConnection, RangeFinder } from "./connections";
 import { roverSettings } from "./globals";
 
 export default class Rover implements IRover {
 
     private connection: RoverConnection;
+    private distance: RangeFinder;
 
     constructor() {
         this.connection = new RoverConnection(roverSettings.host);
+        this.distance = new RangeFinder(roverSettings.host);
     }
 
     public async forward(seconds:number=0, speed:number=1.0): Promise<void> {
