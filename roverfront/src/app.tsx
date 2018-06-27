@@ -58,10 +58,21 @@ async (rover: IRover) => {
 }
 `;
     return <div className="app">
-      <p>RoverFront</p>
-      <RoverEditor initialCode={startCode} ref={(editor) => this.editor = editor} />
-
-      <button onClick={this.runCode}>Run</button>
+      <nav><p>RoverFront</p></nav>
+      <main>
+        <div className="editor">
+          <div className="main">
+            <RoverEditor initialCode={startCode} ref={(editor) => this.editor = editor} />
+          </div>
+          <div className="commands">
+            <button onClick={this.runCode}>Run</button>
+          </div>
+        </div>
+        <div className="monitor">
+          <div className="stats">stats</div>
+          <div className="camera">camera</div>
+        </div>
+      </main>
     </div>;
   }
 }

@@ -8,6 +8,7 @@ interface IRoverEditorProps {
 }
 
 export default class RoverEditor extends React.Component<IRoverEditorProps, {}> {
+    private editorRef: monaco.editor.IEditor | undefined;
 
     constructor(props: IRoverEditorProps) {
         super(props);
@@ -31,13 +32,20 @@ export default class RoverEditor extends React.Component<IRoverEditorProps, {}> 
 // For the monaco-editor. We don't have time to inject this properly there.
 declare const rover: IRover;
 `
-, "rover.d.ts");
+            , "rover.d.ts");
+
+        window.addEventListener('resize', () => {
+            if (this.editorRef) {
+                this.editorRef.layout();
+            }
+        });
     }
 
     // A bit dirty, but let's just expose the code as a public field.
     public currentCode: string;
 
-    private editorDidMount(editor: monaco.editor.IEditor) {
+    private editorDidMount =(editor: monaco.editor.IEditor) => {
+        this.editorRef = editor;
         editor.focus()
     }
     private onChange = (newValue: string) => {
@@ -53,8 +61,6 @@ declare const rover: IRover;
         };
 
         return <MonacoEditor
-            width="600"
-            height="500"
             language="typescript"
             theme="vs-dark"
             value={this.currentCode}
