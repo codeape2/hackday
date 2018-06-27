@@ -1,12 +1,13 @@
 import * as React from "react";
 import * as highcharts from "highcharts";
-import { RangeFinder, IRangeMeasurement } from "src/modules/connections";
+import { RangeFinder, IRangeMeasurement, Firehose, IFirehoseData } from "src/modules/connections";
 
 export default class RoverStats extends React.Component<{}, {}> {
     private container: HTMLDivElement | null;
     private chart: highcharts.ChartObject;
 
     private latestMeasurement: IRangeMeasurement;
+    public latestFirehoseData: IFirehoseData;
 
     public componentWillUnmount() {
         if (this.chart) {
@@ -21,6 +22,11 @@ export default class RoverStats extends React.Component<{}, {}> {
     public componentDidMount() {
         RangeFinder.globalHook.push((measurement) => {
             this.latestMeasurement = measurement;
+            this.syncChartWithProps();
+        });
+
+        Firehose.globalHook.push((data) => {
+            this.latestFirehoseData = data;
             this.syncChartWithProps();
         });
 
@@ -39,6 +45,16 @@ export default class RoverStats extends React.Component<{}, {}> {
                     id: "rangeSeries",
                     name: "Range",
                     data: []
+                },
+                {
+                    id: "accelSeriesX",
+                    name: "Acceleration X",
+                    data: []
+                },
+                {
+                    id: "accelSeriesY",
+                    name: "Acceleration X",
+                    data: []
                 }]
             });
         }
@@ -54,13 +70,17 @@ export default class RoverStats extends React.Component<{}, {}> {
 
         const chartElement = this.chart;
 
-
-
         const rangeSeries = chartElement.get("rangeSeries") as highcharts.SeriesObject;
+        const accelSeriesX = chartElement.get("accelSeriesX") as highcharts.SeriesObject;
+        const accelSeriesY = chartElement.get("accelSeriesY") as highcharts.SeriesObject;
+
         if (this.latestMeasurement) {
             rangeSeries.setData([this.latestMeasurement.value]);
-        } else {
-            rangeSeries.setData([0]);
+        }
+
+        if (this.latestFirehoseData) {
+            accelSeriesX.setData([this.latestFirehoseData.accelerometer.x])
+            accelSeriesY.setData([this.latestFirehoseData.accelerometer.y])
         }
 
         chartElement.redraw();

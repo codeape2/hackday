@@ -96,13 +96,25 @@ export class RoverConnection {
 
 export class Firehose {
     private socket: WebSocket;
+    public static globalHook: ((measurement: IFirehoseData) => void)[] = [];
 
     constructor(host: string) {
         this.socket = new WebSocket("ws://" + host + "/firehose");
         this.socket.onmessage = (evt) => {
             const obj = JSON.parse(evt.data);
             const accel = obj.accel;
-            console.log("X", accel.x, "Y", accel.y, "Z", accel.z);
+            const data: IFirehoseData = {
+                accelerometer: {
+                    x: accel.x,
+                    y: accel.y
+                }
+            };
+            
+            Firehose.globalHook.forEach(hook => {
+                try {
+                    hook(data)
+                } catch (err) { }
+            });
         };
     }
 }
@@ -110,6 +122,13 @@ export class Firehose {
 export interface IRangeMeasurement {
     tick: number;
     value: number;
+}
+
+export interface IFirehoseData {
+    accelerometer: {
+        x: number;
+        y: number
+    }
 }
 
 export class RangeFinder {
