@@ -107,7 +107,7 @@ export class Firehose {
     }
 }
 
-interface IRangeMeasurement {
+export interface IRangeMeasurement {
     tick: number;
     value: number;
 }
@@ -117,6 +117,8 @@ export class RangeFinder {
 
     private measurements: IRangeMeasurement[] = [];
     private latestMeasurement: IRangeMeasurement;
+
+    public static globalHook: ((measurement: IRangeMeasurement) => void)[] = [];
 
     constructor(host: string) {
         this.socket = new WebSocket("ws://" + host + "/rangefinder");
@@ -136,6 +138,14 @@ export class RangeFinder {
 
         this.latestMeasurement = measurement;
         this.measurements.push(measurement);
+
+        // Cheat since we don't have a proper data flow configured.
+        RangeFinder.globalHook.forEach(hook => {
+            try {
+                hook(this.latestMeasurement);
+            } catch (err) {
+            }
+        });
     }
 
     public getLatestDistance() {

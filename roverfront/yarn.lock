@@ -16,6 +16,16 @@
     esutils "^2.0.2"
     js-tokens "^3.0.0"
 
+"@types/geojson@*":
+  version "7946.0.4"
+  resolved "https://registry.yarnpkg.com/@types/geojson/-/geojson-7946.0.4.tgz#4e049756383c3f055dd8f3d24e63fb543e98eb07"
+
+"@types/highcharts@^5.0.23":
+  version "5.0.23"
+  resolved "https://registry.yarnpkg.com/@types/highcharts/-/highcharts-5.0.23.tgz#84b927fa319489d6538e27d0a2504aa446ab0f05"
+  dependencies:
+    "@types/geojson" "*"
+
 "@types/jest@^23.1.2":
   version "23.1.2"
   resolved "https://registry.yarnpkg.com/@types/jest/-/jest-23.1.2.tgz#a6cd37deb9110a8c63dc1435d6ee2518b3bd8e54"
@@ -3053,6 +3063,10 @@ hash.js@^1.0.0, hash.js@^1.0.3:
 he@1.1.x:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/he/-/he-1.1.1.tgz#93410fd21b009735151f8868c2f271f3427e23fd"
+
+highcharts-more@^0.1.7:
+  version "0.1.7"
+  resolved "https://registry.yarnpkg.com/highcharts-more/-/highcharts-more-0.1.7.tgz#43cd6274cccba443166c94d4536d904bbabf9c77"
 
 highcharts@^6.1.1:
   version "6.1.1"
