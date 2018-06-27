@@ -1,5 +1,6 @@
 import * as React from "react";
 import * as highcharts from "highcharts";
+
 import { RangeFinder, IRangeMeasurement, Firehose, IFirehoseData } from "src/modules/connections";
 
 export default class RoverStats extends React.Component<{}, {}> {
@@ -39,7 +40,7 @@ export default class RoverStats extends React.Component<{}, {}> {
                     text: undefined
                 },
                 chart: {
-                    type: "column"
+                    type: "spline"
                 },
                 yAxis: [
                     {
@@ -78,6 +79,14 @@ export default class RoverStats extends React.Component<{}, {}> {
         this.syncChartWithProps();
     }
 
+    private last(data: number[], count: number) {
+        if (data.length <= count) {
+            return data;
+        }
+
+        return data.slice(Math.max(data.length - count, 1))
+    }
+
 
     private syncChartWithProps() {
         if (!this.chart) {
@@ -90,13 +99,19 @@ export default class RoverStats extends React.Component<{}, {}> {
         const accelSeriesX = chartElement.get("accelSeriesX") as highcharts.SeriesObject;
         const accelSeriesY = chartElement.get("accelSeriesY") as highcharts.SeriesObject;
 
+        const count = 30;
+
         if (this.latestMeasurement) {
-            rangeSeries.setData([this.latestMeasurement.value]);
+            const existingData = this.last(rangeSeries.data.map(d => d.y), count);
+            rangeSeries.setData(existingData.concat([this.latestMeasurement.value]));
         }
 
         if (this.latestFirehoseData) {
-            accelSeriesX.setData([this.latestFirehoseData.accelerometer.x])
-            accelSeriesY.setData([this.latestFirehoseData.accelerometer.y])
+            const existingDataX = this.last(accelSeriesX.data.map(d => d.y), count);
+            const existingDataY = this.last(accelSeriesY.data.map(d => d.y), count);
+
+            accelSeriesX.setData(existingDataX.concat([this.latestFirehoseData.accelerometer.x]));
+            accelSeriesY.setData(existingDataY.concat([this.latestFirehoseData.accelerometer.y]));
         }
 
         chartElement.redraw();
