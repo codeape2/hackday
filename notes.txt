@@ -25,3 +25,5 @@ pi / foobar
 
 Skriv ut kildekode python-modul.
 
+Kan jeg pushe til github? Ja
+
