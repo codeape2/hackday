@@ -83,18 +83,14 @@ class FirehoseWebSocket(tornado.websocket.WebSocketHandler):
         self.callback.stop()
 
 
-class MainHandler(tornado.web.RequestHandler):
-    def get(self):
-        self.redirect("/static/index.html")
-
-
 def make_app():
+    root = os.path.join(os.path.dirname(__file__), "static")
     return tornado.web.Application([
-        ("/", MainHandler),
         ("/roverws", RoverWebSocket),
         ("/firehose", FirehoseWebSocket),
-        ("/rangefinder", RangeFinderWebSocket)
-    ], static_path=os.path.join(os.path.dirname(__file__), 'static'))
+        ("/rangefinder", RangeFinderWebSocket),
+        (r"/(.*)", tornado.web.StaticFileHandler, {"path": root, "default_filename": "index.html"})
+    ])
 
 
 def create_rrb3(mockmode):
@@ -136,7 +132,7 @@ def main():
     logging.info("Starting app on port 8888")
     app = make_app()
     app.listen(8888)
-    print "Hallo"
+    print("Hallo")
     logging.info("Starting io loop")
     tornado.ioloop.IOLoop.current().start()
 
