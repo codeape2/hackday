@@ -96,20 +96,39 @@ export class RoverConnection {
 
 export class Firehose {
     private socket: WebSocket;
+    public static globalHook: ((measurement: IFirehoseData) => void)[] = [];
 
     constructor(host: string) {
         this.socket = new WebSocket("ws://" + host + "/firehose");
         this.socket.onmessage = (evt) => {
             const obj = JSON.parse(evt.data);
             const accel = obj.accel;
-            console.log("X", accel.x, "Y", accel.y, "Z", accel.z);
+            const data: IFirehoseData = {
+                accelerometer: {
+                    x: accel.x,
+                    y: accel.y
+                }
+            };
+            
+            Firehose.globalHook.forEach(hook => {
+                try {
+                    hook(data)
+                } catch (err) { }
+            });
         };
     }
 }
 
-interface IRangeMeasurement {
+export interface IRangeMeasurement {
     tick: number;
     value: number;
+}
+
+export interface IFirehoseData {
+    accelerometer: {
+        x: number;
+        y: number
+    }
 }
 
 export class RangeFinder {
@@ -117,6 +136,8 @@ export class RangeFinder {
 
     private measurements: IRangeMeasurement[] = [];
     private latestMeasurement: IRangeMeasurement;
+
+    public static globalHook: ((measurement: IRangeMeasurement) => void)[] = [];
 
     constructor(host: string) {
         this.socket = new WebSocket("ws://" + host + "/rangefinder");
@@ -136,6 +157,14 @@ export class RangeFinder {
 
         this.latestMeasurement = measurement;
         this.measurements.push(measurement);
+
+        // Cheat since we don't have a proper data flow configured.
+        RangeFinder.globalHook.forEach(hook => {
+            try {
+                hook(this.latestMeasurement);
+            } catch (err) {
+            }
+        });
     }
 
     public getLatestDistance() {

@@ -15,9 +15,9 @@ export default class RoverEditor extends React.Component<IRoverEditorProps, {}> 
         super(props);
         this.currentCode = props.initialCode;
 
-        
+
         monaco.languages.typescript.typescriptDefaults.addExtraLib(
-`declare interface IRover {
+            `declare interface IRover {
     forward(seconds: number, speed: number): Promise<void>;
     stop(): Promise<void>;
     right(seconds: number, speed: number): Promise<void>;
@@ -36,9 +36,11 @@ declare const rover: IRover;
             , "rover.d.ts");
 
         window.addEventListener('resize', () => {
-            if (this.editorRef) {
-                this.editorRef.layout();
-            }
+            setTimeout(() => {
+                if (this.editorRef) {
+                    this.editorRef.layout();
+                }
+            }, 100);
         });
     }
 
