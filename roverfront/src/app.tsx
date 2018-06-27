@@ -10,6 +10,7 @@ import * as connections from './modules/connections';
 import { roverSettings } from './modules/globals';
 import Rover from 'src/modules/rover';
 import { IRover } from './rover';
+import RoverStats from './components/roveStats';
 
 class App extends React.Component {
 
@@ -59,30 +60,37 @@ class App extends React.Component {
     return "http://" + roverSettings.host + "/camera";
   }
 
+  public getInitialCode() {
+    const code = localStorage.getItem(roverSettings.codeKey);
+    if (code && code.length) {
+      return code;
+    }
+
+    return `
+    async (rover: IRover) => {
+      // Your code here
+      await rover.forward();
+      await rover.wait(3000);
+      await rover.stop();
+    }
+    `;
+  }
+
   public render() {
 
-    const startCode =
-      `
-async (rover: IRover) => {
-  // Your code here
-  await rover.forward();
-  await rover.wait(3000);
-  await rover.stop();
-}
-`;
     return <div className="app">
       <nav><p>RoverFront</p></nav>
       <main>
         <div className="editor">
           <div className="main">
-            <RoverEditor initialCode={startCode} ref={(editor) => this.editor = editor} />
+            <RoverEditor initialCode={this.getInitialCode()} ref={(editor) => this.editor = editor} />
           </div>
           <div className="commands">
             <button onClick={this.runCode}>Run</button>
           </div>
         </div>
         <div className="monitor">
-          <div className="stats">stats</div>
+          <div className="stats"><RoverStats /></div>
           <div className="camera">
             <img src={this.getCameraUrl()} ref={cameraImage => this.cameraImage = cameraImage} />
           </div>

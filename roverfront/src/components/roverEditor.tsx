@@ -1,6 +1,7 @@
 import * as monaco from 'monaco-editor';
 import * as React from 'react';
 import MonacoEditor from 'react-monaco-editor';
+import { roverSettings } from '../modules/globals';
 // import roverDefs from '../rover.txt';
 
 interface IRoverEditorProps {
@@ -37,12 +38,14 @@ declare const rover: IRover;
     // A bit dirty, but let's just expose the code as a public field.
     public currentCode: string;
 
-    private editorDidMount =(editor: monaco.editor.IEditor) => {
+    private editorDidMount = (editor: monaco.editor.IEditor) => {
         this.editorRef = editor;
         editor.focus()
     }
     private onChange = (newValue: string) => {
         this.currentCode = newValue;
+
+        localStorage.setItem(roverSettings.codeKey, this.currentCode);
     }
 
     public render() {
