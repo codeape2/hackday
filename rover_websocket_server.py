@@ -20,10 +20,15 @@ try:
 except ImportError:
     print("WARNING: Unable to import rrb3")
 
+try:
+    import picamera
+except ImportError:
+    print("Warning: Unable to import picamera")
 
 # the global RRB3 instance
 rover = None  # type: rrb3.RRB3
 sensor = None # type: mpu6050
+camera = None  # type: picamera.PiCamera
 
 
 FIREHOSE_INTERVAL = 200
@@ -103,6 +108,13 @@ class FirehoseWebSocket(tornado.websocket.WebSocketHandler):
         logging.debug("Closing /firehose ws")
         self.callback.stop()
 
+class CameraHandler(tornado.web.RequestHandler):
+    def get(self, *args, **kwargs):
+        camera.capture("picture.jpg")
+        self.set_header("Content-type", "image/jpg")
+        with open("picture.jpg", 'rb') as f:
+            self.write(f.read())
+        self.finish()
 
 def make_app():
     root = os.path.join(os.path.dirname(__file__), "static")
@@ -110,6 +122,7 @@ def make_app():
         ("/roverws", RoverWebSocket),
         ("/firehose", FirehoseWebSocket),
         ("/rangefinder", RangeFinderWebSocket),
+        ("/camera", CameraHandler),
         (r"/(.*)", NoCacheStaticFileHandler, {"path": root, "default_filename": "index.html"})
     ])
 
@@ -135,10 +148,21 @@ def create_sensor(mockmode):
         return MockMPU6050()
 
 
+def create_camera(mockmode):
+    if not mockmode:
+        from picamera import PiCamera
+        return PiCamera()
+    else:
+        class MockCamera:
+            pass
+        return MockCamera()
+
+
 
 def main():
     global rover
     global sensor
+    global camera
 
     from argparse import ArgumentParser
     parser = ArgumentParser()
@@ -149,6 +173,7 @@ def main():
 
     rover = create_rrb3(args.mockmode)
     sensor = create_sensor(args.mockmode)
+    camera = create_camera(args.mockmode)
 
     logging.info("Starting app on port 8888")
     app = make_app()
