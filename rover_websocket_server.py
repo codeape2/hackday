@@ -26,8 +26,8 @@ except ImportError:
     print("Warning: Unable to import picamera")
 
 # the global RRB3 instance
-rover = None  # type: rrb3.RRB3
-sensor = None # type: mpu6050
+rover = None   # type: rrb3.RRB3
+sensor = None  # type: mpu6050
 camera = None  # type: picamera.PiCamera
 
 
@@ -95,9 +95,11 @@ class RangeFinderWebSocket(tornado.websocket.WebSocketHandler):
         logging.debug("Closing /rangefinder ws")
         self.callback.stop()
 
+
 class NoCacheStaticFileHandler(tornado.web.StaticFileHandler):
     def set_extra_headers(self, path):
         self.set_header("Cache-control", "no-cache")
+
 
 class FirehoseWebSocket(tornado.websocket.WebSocketHandler):
     def check_origin(self, origin):
@@ -118,6 +120,7 @@ class FirehoseWebSocket(tornado.websocket.WebSocketHandler):
         logging.debug("Closing /firehose ws")
         self.callback.stop()
 
+
 class CameraHandler(tornado.web.RequestHandler):
     def get(self, *args, **kwargs):
         camera.capture("picture.jpg")
@@ -125,6 +128,7 @@ class CameraHandler(tornado.web.RequestHandler):
         with open("picture.jpg", 'rb') as f:
             self.write(f.read())
         self.finish()
+
 
 def make_app():
     root = os.path.join(os.path.dirname(__file__), "static")
@@ -167,7 +171,6 @@ def create_camera(mockmode):
             def capture(self, *args, **kwargs):
                 pass
         return MockCamera()
-
 
 
 def main():
