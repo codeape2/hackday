@@ -11,6 +11,7 @@ import { roverSettings } from './modules/globals';
 import Rover from 'src/modules/rover';
 import { IRover } from './rover';
 import RoverStats from './components/roveStats';
+import RoverSimulationContainer from './components/roverSimulationContainer';
 
 class App extends React.Component {
 
@@ -91,8 +92,10 @@ class App extends React.Component {
         </div>
         <div className="monitor">
           <div className="stats"><RoverStats /></div>
+
           <div className="camera">
-            <img src={this.getCameraUrl()} ref={cameraImage => this.cameraImage = cameraImage} />
+            {/*<img src={this.getCameraUrl()} ref={cameraImage => this.cameraImage = cameraImage} />*/}
+            <RoverSimulationContainer />
           </div>
         </div>
       </main>
