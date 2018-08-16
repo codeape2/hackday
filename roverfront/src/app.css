@@ -40,7 +40,7 @@ div.editor .main {
 div.monitor {
   grid-column: 2;
   display: grid;
-  grid-template-rows: 1fr auto;
+  grid-template-rows: 0.5fr auto;
 }
 
 div.monitor .stats {
@@ -52,6 +52,11 @@ div.monitor .camera {
 }
 
 div.monitor .camera img {
+  width: 100%;
+  height: 100%;
+}
+
+div.monitor .camera canvas {
   width: 100%;
   height: 100%;
 }

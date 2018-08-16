@@ -32,11 +32,6 @@ export class RoverConnection {
                 delete this.resolveFunctionsById.actionId;
             }
         };
-
-        // Wire up the keyhandling here for now just to match old behaviour.
-        /*window.addEventListener('keypress', (e) => {
-            this.keyPress(e);
-        });*/
     }
 
     public execute(method: string, kwargs: object) {
@@ -53,45 +48,6 @@ export class RoverConnection {
             this.socket.send(JSON.stringify(invocation));
         });
     }
-
-    /*public forward() {
-        this.execute('forward', {});
-    }
-
-    public left() {
-        this.execute('left', {});
-    }
-
-    public stop() {
-        this.execute('stop', {});
-    }
-
-    public right() {
-        this.execute('right', {});
-    }
-
-    public back() {
-        this.execute('reverse', { speed: 0.3 });
-    }*/
-
-    /*public keyPress(event: KeyboardEvent) {
-        const code = event.keyCode;
-        if (code === 119) {
-            this.forward();
-        }
-        else if (code === 97) {
-            this.left();
-        }
-        else if (code === 115) {
-            this.stop();
-        }
-        else if (code === 100) {
-            this.right();
-        }
-        else if (code === 122) {
-            this.back();
-        }
-    }*/
 }
 
 export class Firehose {
@@ -109,7 +65,7 @@ export class Firehose {
                     y: accel.y
                 }
             };
-            
+
             Firehose.globalHook.forEach(hook => {
                 try {
                     hook(data)

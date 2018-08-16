@@ -1,25 +1,29 @@
 
+import * as moment from "moment";
 import * as React from 'react';
 import './app.css';
-
-import * as moment from "moment";
-import logo from './logo.png';
 import RoverEditor from './components/roverEditor';
-import { compileTs } from './modules/tsCompiler';
-import * as connections from './modules/connections';
-import { roverSettings } from './modules/globals';
-import Rover from 'src/modules/rover';
-import { IRover } from './rover';
+import RoverSimulationContainer from './components/roverSimulationContainer';
 import RoverStats from './components/roveStats';
+import { IRoverHandler } from './contracts';
+import { roverSettings } from './modules/globals';
+import SimulatedRover from './modules/simulatedRover';
+import { compileTs } from './modules/tsCompiler';
+import { IRover } from './rover';
+
 
 class App extends React.Component {
 
-  private rover: Rover;
+  private rover: SimulatedRover;
+  private roverHandler: IRoverHandler;
   private cameraImage: HTMLImageElement | null;
 
   constructor(props: any) {
     super(props);
-    this.rover = new Rover();
+
+    this.roverHandler = {};
+    //this.rover = new Rover();
+    this.rover = new SimulatedRover(this.roverHandler);
 
     setTimeout(() => {
       const url = this.getCameraUrl();
@@ -29,16 +33,6 @@ class App extends React.Component {
     }, 5000);
   }
 
-  public componentDidMount() {
-    const host = window.location.host; // TODO - Inject. Won't work on dev server.
-
-    /*
-    const rover = new connections.Rover(roverSettings.host);
-    const firehose = new connections.Firehose(roverSettings.host);
-    const range = new connections.RangeFinder(roverSettings.host);
-    */
-  }
-
   private editor: RoverEditor | null;
 
   private runCode = async () => {
@@ -46,13 +40,18 @@ class App extends React.Component {
       return;
     }
 
-    // Compile to javascript.
     const tsCode = this.editor.currentCode;
     const jsCode = compileTs(tsCode);
 
     const instance = eval(jsCode) as (rover: IRover) => Promise<any>;
     if (typeof instance === "function") {
       instance(this.rover);
+    }
+  };
+
+  private clearSimulation = async () => {
+    if (this.roverHandler.clearSimulation) {
+      this.roverHandler.clearSimulation();
     }
   };
 
@@ -69,9 +68,12 @@ class App extends React.Component {
     return `
     async (rover: IRover) => {
       // Your code here
-      await rover.forward();
-      await rover.wait(3000);
-      await rover.stop();
+      await rover.forward(2, 1);
+      await rover.forward(2, 5);
+      await rover.wait(3);
+      await rover.reverse(4, 3);
+      await rover.left(1, 1);
+      await rover.right(1, 1);
     }
     `;
   }
@@ -87,12 +89,15 @@ class App extends React.Component {
           </div>
           <div className="commands">
             <button onClick={this.runCode}>Run</button>
+            <button onClick={this.clearSimulation}>Clear</button>
           </div>
         </div>
         <div className="monitor">
           <div className="stats"><RoverStats /></div>
+
           <div className="camera">
-            <img src={this.getCameraUrl()} ref={cameraImage => this.cameraImage = cameraImage} />
+            {/*<img src={this.getCameraUrl()} ref={cameraImage => this.cameraImage = cameraImage} />*/}
+            <RoverSimulationContainer rover={this.roverHandler} cameraFollowRover={true} />
           </div>
         </div>
       </main>
