@@ -14,7 +14,7 @@ export default class RoverSimulationContainer extends React.Component<ISimulatio
         const { canvas, scene, engine } = e;
 
         // This creates and positions a free camera (non-mesh)
-        const camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(-5, 6, -10), scene);
+        const camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(-8, 6, -10), scene);
         camera.setTarget(BABYLON.Vector3.Zero());
         camera.attachControl(canvas, true);
 
